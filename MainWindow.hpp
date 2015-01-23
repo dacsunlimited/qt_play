@@ -9,6 +9,7 @@
 #include <QMenu>
 #include <QSystemTrayIcon>
 #include <QTimer>
+#include <QUuid>
 
 class MainWindow : public QMainWindow
 {
@@ -30,6 +31,8 @@ class MainWindow : public QMainWindow
     uint8_t _patchVersion = 0;
 
     QTimer* _updateChecker;
+    QUuid app_id;
+    QString version;
     
   public:
     MainWindow();
@@ -68,7 +71,6 @@ public Q_SLOTS:
     void goToBlock(uint32_t blockNumber);
     void goToBlock(QString blockId);
     void goToTransaction(QString transactionId);
-
     void importWallet();
 
 private Q_SLOTS:
@@ -87,4 +89,5 @@ private:
     void initMenu();
     void showNoUpdateAlert();
     bool verifyUpdateSignature(QByteArray updatePackage);
+    void goToRefCode(QStringList components);
 };

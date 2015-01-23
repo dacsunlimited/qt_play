@@ -52,8 +52,10 @@ MainWindow::MainWindow()
   readSettings();
   initMenu();
 
-  QString version = bts::utilities::git_revision_description;
-  QRegExp versionMatcher("v(\\d+)\\.(\\d+)\\.(\\d+)(-([a-z]))?");
+  version = bts::utilities::git_revision_description;
+  // for an official release, git_revision_description is the git tag, which will
+  // look like bts/0.4.28 or dvs/0.4.29
+  QRegExp versionMatcher(".*/(\\d+)\\.(\\d+)\\.(\\d+)(-([a-z]))?");
   versionMatcher.indexIn(version);
   if (versionMatcher.pos(3) != -1)
   {
@@ -82,11 +84,13 @@ bool MainWindow::eventFilter(QObject* object, QEvent* event)
   if ( event->type() == QEvent::FileOpen )
   {
     QFileOpenEvent* urlEvent = static_cast<QFileOpenEvent*>(event);
-    ilog("Got URL to open: ${url}", ("url", urlEvent->file().toStdString()));
+    QString url = urlEvent->file();
+    if( url.isEmpty() ) url = urlEvent->url().toString();
+    ilog("Got URL to open: ${url}", ("url", url.toStdString()));
     if( isVisible() )
-      processCustomUrl(urlEvent->file());
+      processCustomUrl(url);
     else
-      deferCustomUrl(urlEvent->file());
+      deferCustomUrl(url);
     return true;
   }
   else if( object == this && event->type() == QEvent::Close && _trayIcon )
@@ -241,6 +245,10 @@ void MainWindow::processCustomUrl(QString url)
   else if( components[0] == "Trx" )
   {
     goToTransaction(components[1]);
+  }
+  else if( components[0] == "RefCode" )
+  {
+    goToRefCode(components);
   }
 }
 
@@ -448,6 +456,30 @@ void MainWindow::goToTransaction(QString transactionId)
     errorDialog.exec();
 }
 
+void MainWindow::goToRefCode(QStringList components)
+{
+    if(!walletIsUnlocked()) return;
+    
+    QString faucet;
+    QString code;
+    QStringList parameters = components.mid(1);
+    
+    while (!parameters.empty()) {
+        QString parameterName = parameters.takeFirst();
+        if (parameterName == "faucet")
+            faucet = parameters.takeFirst();
+        else if (parameterName == "code")
+            code = parameters.takeFirst();
+        else
+            parameters.pop_front();
+    }
+    
+    QString url = QStringLiteral("/referral_code?faucet=%1&code=%2")
+    .arg(faucet)
+    .arg(code);
+    navigateTo(url);
+}
+
 Html5Viewer* MainWindow::getViewer()
 {
   return static_cast<Html5Viewer*>(centralWidget());
@@ -607,7 +639,7 @@ void MainWindow::doLogin(QStringList components)
     }
 
     QUrl url("http://" + QStringList(components.mid(2)).join('/'));
-    QUrlQuery query;
+    QUrlQuery query(url.query());
     query.addQueryItem("client_key",  fc::variant(bts::blockchain::public_key_type(myOneTimeKey.get_public_key())).as_string().c_str());
     query.addQueryItem("client_name", loginUser.c_str());
     query.addQueryItem("server_key", fc::variant(serverOneTimeKey).as_string().c_str());
@@ -669,6 +701,14 @@ void MainWindow::readSettings()
   }
   else {
     resize(1024,768);
+  }
+  if( _settings.contains("app_id") )
+  {
+      app_id = QUuid(_settings.value("app_id").toString());
+  }
+  else {
+      app_id = QUuid::createUuid();
+       _settings.setValue("app_id",app_id.toString());
   }
 }
 
@@ -798,7 +838,7 @@ bool MainWindow::verifyUpdateSignature (QByteArray updatePackage)
 
   auto authorized_signers = WEB_UPDATES_SIGNING_KEYS;
   for (auto signature : _webUpdateDescription.signatures)
-    authorized_signers.erase(bts::blockchain::address(fc::ecc::public_key(signature, hash)));
+    authorized_signers.erase(bts::blockchain::address(fc::ecc::public_key(signature, hash, false)));
   if ((WEB_UPDATES_SIGNING_KEYS.size() - authorized_signers.size()) >= WEB_UPDATES_SIGNATURE_REQUIREMENT)
     return true;
   elog("Rejecting update signature: signature requirement failed (got ${match}/${req} matches)", ("match", WEB_UPDATES_SIGNING_KEYS.size() - authorized_signers.size())("req", WEB_UPDATES_SIGNATURE_REQUIREMENT));
@@ -819,7 +859,11 @@ void MainWindow::showNoUpdateAlert()
 
 void MainWindow::checkWebUpdates(bool showNoUpdatesAlert, std::function<void()> finishedCheckCallback)
 {
-  QUrl manifestUrl(WEB_UPDATES_MANIFEST_URL);
+  QString queryString = QString("?uuid=%1&version=%2").arg(app_id.toString().mid(1,36), version);
+#if QT_VERSION >= 0x050400
+  queryString += QString("&platform=%1").arg(QSysInfo::prettyProductName());
+#endif
+  QUrl manifestUrl(WEB_UPDATES_MANIFEST_URL + queryString);
   QDir dataDir(QString(clientWrapper()->get_data_dir()));
 
   if (dataDir.exists("web.json") ^ dataDir.exists("web.dat"))
