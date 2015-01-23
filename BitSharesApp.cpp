@@ -322,8 +322,8 @@ int BitSharesApp::run(int& argc, char** argv)
 
 int BitSharesApp::run()
 {
-   setOrganizationName("BitShares");
-   setOrganizationDomain("bitshares.org");
+   setOrganizationName("DACPLAY");
+   setOrganizationDomain("dacplay.org");
    setApplicationName(BTS_BLOCKCHAIN_NAME);
 
    //This works around Qt bug 22410, which causes a crash when repeatedly clicking a QComboBox
