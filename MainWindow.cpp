@@ -376,11 +376,13 @@ void MainWindow::setupTrayIcon()
     _trayIcon->showMessage(tr("%1 sent you %2").arg(sender).arg(amount),
                            tr("%1 just received %2 from %3!\n\nMemo: %4").arg(receiver).arg(amount).arg(sender).arg(memo));
   });
+  /*
   wallet->update_margin_position.connect([=](const bts::wallet::ledger_entry& entry) {
       QString amount = clientWrapper()->get_client()->get_chain()->to_pretty_asset(entry.amount).c_str();
       _trayIcon->showMessage(tr("Your short order has been filled"),
                              tr("You just sold %1 from your short order.").arg(amount));
   });
+  */
   clientWrapper()->get_client()->get_mail_client()->new_mail_notifier.connect([=](int newMessages) {
     if (newMessages <= 0) 
       return;
