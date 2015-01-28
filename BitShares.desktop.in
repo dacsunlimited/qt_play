@@ -1,6 +1,6 @@
 [Desktop Entry]
 Name=${APP_NAME}
-Comment=A decentralized bank and exchange
+Comment=A decentralized, autonomous game assets marketplace and game platform
 Exec=${APP_NAME} %u
 Icon=/usr/local/share/icons/${APP_NAME}.png
 Type=Application
