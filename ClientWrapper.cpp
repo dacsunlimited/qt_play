@@ -215,7 +215,7 @@ void ClientWrapper::initialize(INotifier* notifier)
 
 QUrl ClientWrapper::http_url() const
 {
-  QUrl url = QString::fromStdString("http://" + std::string( *_actual_httpd_endpoint ) );
+  QUrl url = QString::fromStdString("http://" + std::string( *_actual_httpd_endpoint ) + "/#/unlockwallet" );
   url.setUserName(_cfg.rpc.rpc_user.c_str() );
   url.setPassword(_cfg.rpc.rpc_password.c_str() );
   return url;
