@@ -233,7 +233,7 @@ ENDIF()
 IF( WIN32 AND INCLUDE_CRASHRPT )
   foreach(binary ${CRASHRPT_BINARIES_TO_INSTALL})
     set(POST_BUILD_STEP_COMMANDS ${POST_BUILD_STEP_COMMANDS}
-      COMMAND ${CMAKE_COMMAND} -E copy_if_different "${binary}" "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
+      COMMAND ${CMAKE_COMMAND} -E copy_if_different "${binary}" "${BITSHARES_ROOT}/bin")
   endforeach()
 ENDIF()
 
