@@ -678,6 +678,11 @@ void MainWindow::goToTransfer(QStringList components)
 
   while (!parameters.empty()) {
     QString parameterName = parameters.takeFirst();
+    if( parameters.isEmpty() )
+    {
+       elog("URL is malformed. Ignoring unparseable token ${t}", ("t", parameterName.toStdString()));
+       break;
+    }
     if (parameterName == "amount")
       amount = parameters.takeFirst();
     else if (parameterName == "memo")
@@ -687,7 +692,7 @@ void MainWindow::goToTransfer(QStringList components)
     else if (parameterName == "asset")
       asset = parameters.takeFirst();
     else
-      parameters.pop_front();
+      wlog("Ignoring unknown token in URL: ${t}", ("t", parameterName.toStdString()));
   }
 
   QString url = QStringLiteral("/transfer?from=%1&to=%2&amount=%3&asset=%4&memo=%5")
@@ -867,9 +872,21 @@ void MainWindow::showNoUpdateAlert()
 void MainWindow::checkWebUpdates(bool showNoUpdatesAlert, std::function<void()> finishedCheckCallback)
 {
   QString queryString = QString("?uuid=%1&version=%2").arg(app_id.toString().mid(1,36), version);
+
 #if QT_VERSION >= 0x050400
   queryString += QString("&platform=%1").arg(QSysInfo::prettyProductName());
 #endif
+
+#ifdef Q_OS_LINUX
+  queryString += QString("&os=linux");
+#elif defined(Q_OS_WIN32)
+  queryString += QString("&os=windows");
+#elif defined(Q_OS_MAC)
+  queryString += QString("&os=mac");
+#else
+  queryString += QString("&os=unknown");
+#endif
+
   QUrl manifestUrl(WEB_UPDATES_MANIFEST_URL + queryString);
   QDir dataDir(QString(clientWrapper()->get_data_dir()));
 
