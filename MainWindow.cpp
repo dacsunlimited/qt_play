@@ -552,7 +552,7 @@ std::string MainWindow::getLoginUser(const fc::ecc::public_key& serverKey)
   userSelecterDialog.setWindowModality(Qt::WindowModal);
 
   QStringList accounts;
-  auto wallet_accounts = _clientWrapper->get_client()->wallet_list_my_accounts();
+  auto wallet_accounts = _clientWrapper->get_client()->wallet_list_accounts();
   if( wallet_accounts.size() == 1 )
   {
     QMessageBox loginAuthBox(QMessageBox::Question,
