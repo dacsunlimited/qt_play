@@ -544,7 +544,7 @@ std::string MainWindow::getLoginUser(const fc::ecc::public_key& serverKey)
     {
     }
 
-    if( head_block_age < 1000 )
+    if( head_block_age < 1 )
       QMessageBox::critical(this,
                             tr("Misconfigured Website"),
                             tr("The website you are trying to log into is experiencing problems, and cannot accept logins at this time."));
