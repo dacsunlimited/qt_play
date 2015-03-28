@@ -851,6 +851,8 @@ bool MainWindow::verifyUpdateSignature (QByteArray updatePackage)
       return false;
   }
 
+  elog("The size of the update package is ${s}", ("s", updatePackage.size()));
+
   fc::sha256::encoder enc;
   enc.write(updatePackage.data(), updatePackage.size());
   std::string desc = _webUpdateDescription.signable_string();
@@ -859,21 +861,24 @@ bool MainWindow::verifyUpdateSignature (QByteArray updatePackage)
 
   auto authorized_signers = WEB_UPDATES_SIGNING_KEYS;
   for (auto signature : _webUpdateDescription.signatures)
+  {
     authorized_signers.erase(bts::blockchain::address(fc::ecc::public_key(signature, hash, false)));
+    elog("The address of the update package is ${s}", ("s", bts::blockchain::address(fc::ecc::public_key(signature, hash, false))));
+  }
   if ((WEB_UPDATES_SIGNING_KEYS.size() - authorized_signers.size()) >= WEB_UPDATES_SIGNATURE_REQUIREMENT)
     return true;
   elog("Rejecting update signature: signature requirement failed (got ${match}/${req} matches)", ("match", WEB_UPDATES_SIGNING_KEYS.size() - authorized_signers.size())("req", WEB_UPDATES_SIGNATURE_REQUIREMENT));
   return false;
 }
 
-void MainWindow::showNoUpdateAlert()
+void MainWindow::showNoUpdateAlert(QString info)
 {
     QMessageBox noUpdateDialog(this);
     noUpdateDialog.setIcon(QMessageBox::Information);
     noUpdateDialog.addButton(QMessageBox::Ok);
     noUpdateDialog.setDefaultButton(QMessageBox::Ok);
     noUpdateDialog.setWindowModality(Qt::WindowModal);
-    noUpdateDialog.setText(tr("No new updates are available."));
+    noUpdateDialog.setText(tr("No new updates are available. Currrent version is %1.%2.%3-%4. %5").arg(_majorVersion).arg(_forkVersion).arg(_minorVersion).arg(_patchVersion).arg(info));
     noUpdateDialog.setWindowTitle(tr("%1 Update").arg(qApp->applicationName()));
     noUpdateDialog.exec();
 }
@@ -927,15 +932,15 @@ void MainWindow::checkWebUpdates(bool showNoUpdatesAlert, std::function<void()> 
         WebUpdateManifest::UpdateDetails update;
         update.majorVersion = _majorVersion;
         update.forkVersion = _forkVersion;
-        update.minorVersion = _minorVersion + 1;
+        update.minorVersion = _minorVersion;
+        update.patchVersion = _patchVersion + 1;
 
         auto itr = manifest.updates.lower_bound(update);
-        if (itr == manifest.updates.begin())
+        if (itr == manifest.updates.end())
         {
           if (showNoUpdatesAlert) showNoUpdateAlert();
           return;
         }
-        --itr;
         update = *itr;
         if (update.majorVersion != _majorVersion || update.forkVersion != _forkVersion
                 || update.minorVersion != _minorVersion || update.patchVersion <= _patchVersion

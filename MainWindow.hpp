@@ -88,7 +88,7 @@ private:
     void readSettings();
     virtual void closeEvent( QCloseEvent* );
     void initMenu();
-    void showNoUpdateAlert();
+    void showNoUpdateAlert(QString info = tr(""));
     bool verifyUpdateSignature(QByteArray updatePackage);
     void goToRefCode(QStringList components);
 };
