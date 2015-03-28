@@ -932,15 +932,15 @@ void MainWindow::checkWebUpdates(bool showNoUpdatesAlert, std::function<void()> 
         WebUpdateManifest::UpdateDetails update;
         update.majorVersion = _majorVersion;
         update.forkVersion = _forkVersion;
-        update.minorVersion = _minorVersion;
-        update.patchVersion = _patchVersion + 1;
+        update.minorVersion = _minorVersion + 1;
 
         auto itr = manifest.updates.lower_bound(update);
-        if (itr == manifest.updates.end())
+        if (itr == manifest.updates.begin())
         {
           if (showNoUpdatesAlert) showNoUpdateAlert();
           return;
         }
+        --itr;
         update = *itr;
         if (update.majorVersion != _majorVersion || update.forkVersion != _forkVersion
                 || update.minorVersion != _minorVersion || update.patchVersion <= _patchVersion
