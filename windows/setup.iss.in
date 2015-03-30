@@ -32,8 +32,8 @@
 #define NUMERIC_VERSION "@NUMERIC_ONLY_VERSION_STRING@"
 
 [Setup]
-AppPublisher=BitShares
-AppPublisherURL=http://bitshares.org
+AppPublisher=DacPlay
+AppPublisherURL=http://dacplay.org/
 AppVersion={#VERSION}
 AppName={#APPNAME}{#PLATFORM_TITLE}
 AppVerName={#APPNAME}{#PLATFORM_TITLE} {#VERSION}
@@ -42,14 +42,14 @@ DefaultGroupName={#APPNAME}
 Compression=lzma/Ultra
 SolidCompression=true
 VersionInfoVersion={#NUMERIC_VERSION}
-VersionInfoCompany=BitShares
+VersionInfoCompany=DacPlay
 VersionInfoDescription={#APPNAME}
-AppCopyright=(c) 2015 BitShares
+AppCopyright=(c) 2015 DacPlay
 DirExistsWarning=no
 DisableStartupPrompt=true
 WindowVisible=false
-AppSupportURL=http://bitshares.org
-AppUpdatesURL=http://bitshares.org
+AppSupportURL=http://dacplay.org
+AppUpdatesURL=http://dacplay.org
 ;AppReadmeFile={app}\README.TXT
 ShowLanguageDialog=no
 LanguageDetectionMethod=none
