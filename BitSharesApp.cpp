@@ -326,7 +326,7 @@ int BitSharesApp::run()
    setOrganizationDomain("dacplay.org");
    setApplicationName(BTS_BLOCKCHAIN_NAME);
 
-   //This works around Qt bug 22410, which causes a crash when repeatedly clicking a QComboBox
+   //This works around Qt bu    g 22410, which causes a crash when repeatedly clicking a QComboBox
    class CrashWorkaroundStyle : public QProxyStyle {
    public: virtual int styleHint(StyleHint hint, const QStyleOption *option = 0,
                                  const QWidget *widget = 0, QStyleHintReturn *returnData = 0) const{
@@ -385,6 +385,7 @@ int BitSharesApp::run()
    mainWindow.setCentralWidget(viewer);
    mainWindow.setClientWrapper(clientWrapper.get());
    mainWindow.loadWebUpdates();
+    mainWindow.setupNavToolbar();
 
    QTimer fc_tasks;
    fc_tasks.connect(&fc_tasks, &QTimer::timeout, [](){ fc::usleep(fc::microseconds(1000)); });
@@ -452,11 +453,14 @@ void setupMenus(ClientWrapper* client, MainWindow* mainWindow)
 void BitSharesApp::prepareStartupSequence(ClientWrapper* client, Html5Viewer* viewer, MainWindow* mainWindow, QSplashScreen* splash)
 {
    viewer->connect(viewer->webView(), &QGraphicsWebView::urlChanged, [viewer,client,mainWindow] (const QUrl& newUrl) {
+       ilog("loading for URL ${url}", ("url", newUrl.toString().toStdString()));
+       mainWindow->updateLocationEdit(newUrl);
+       
       //Disallow navigating to pages not served by us
       if (!newUrl.isEmpty() && newUrl.host() != "localhost" && newUrl.host() != "127.0.0.1") {
-         elog("Denying request to browse to non-localhost URL ${url}", ("url", newUrl.toString().toStdString()));
-         QTimer::singleShot(0, viewer->webView(), SLOT(back()));
-         Utilities::open_in_external_browser(newUrl);
+//         elog("Denying request to browse to non-localhost URL ${url}", ("url", newUrl.toString().toStdString()));
+//         QTimer::singleShot(0, viewer->webView(), SLOT(back()));
+//         Utilities::open_in_external_browser(newUrl);
          return;
       }
 
@@ -499,6 +503,8 @@ void BitSharesApp::prepareStartupSequence(ClientWrapper* client, Html5Viewer* vi
    client->connect(client, &ClientWrapper::status_update, [=](QString messageString) {
       splash->showMessage(messageString, Qt::AlignCenter | Qt::AlignBottom, Qt::white);
    });
+    
+
 }
 
 QLocalServer* BitSharesApp::startSingleInstanceServer(MainWindow* mainWindow)

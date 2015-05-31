@@ -43,6 +43,7 @@
 #include <Carbon/Carbon.h>
 #endif
 
+
 MainWindow::MainWindow()
   : _settings("BitShares", BTS_BLOCKCHAIN_NAME),
     _trayIcon(nullptr),
@@ -396,6 +397,37 @@ void MainWindow::setupTrayIcon()
           _trayIcon->showMessage(tr("New Mail"), tr("You just received %1 new mail messages.").arg(newMessages));
       });
   }
+}
+
+void MainWindow::setupNavToolbar()
+{
+    _navToolBar = addToolBar(tr("Navigation"));
+    
+    _navToolBar->addAction(getViewer()->webView()->pageAction(QWebPage::WebAction::Back));
+    _navToolBar->addAction(getViewer()->webView()->pageAction(QWebPage::WebAction::Forward));
+    //_navToolBar->addAction(getViewer()->webView()->pageAction(QWebPage::WebAction::Reload));
+    //_navToolBar->addAction(getViewer()->webView()->pageAction(QWebPage::WebAction::Stop));
+
+    
+    _locationEdit = new QLineEdit(this);
+    _locationEdit->setSizePolicy(QSizePolicy::Expanding, _locationEdit->sizePolicy().verticalPolicy());
+    connect(_locationEdit, SIGNAL(returnPressed()), SLOT(changeLocation()));
+    
+    _navToolBar->addWidget(_locationEdit);
+    
+}
+
+void MainWindow::changeLocation()
+{
+    QUrl url = QUrl::fromUserInput(_locationEdit->text());
+    getViewer()->webView()->load(url);
+    getViewer()->webView()->setFocus();
+
+}
+
+void MainWindow::updateLocationEdit(const QUrl& newUrl)
+{
+    _locationEdit->setText(newUrl.toString());
 }
 
 void MainWindow::goToBlock(uint32_t blockNumber)

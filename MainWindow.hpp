@@ -11,6 +11,14 @@
 #include <QTimer>
 #include <QUuid>
 
+#include <QtWidgets>
+//#include <QtWebEngineWidgets>
+
+QT_BEGIN_NAMESPACE
+class QWebEngineView;
+class QLineEdit;
+QT_END_NAMESPACE
+
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -19,6 +27,9 @@ class MainWindow : public QMainWindow
     QMenu* _accountMenu;
     QString _deferredUrl;
     QSystemTrayIcon* _trayIcon;
+    
+    QLineEdit *_locationEdit;
+    QToolBar *_navToolBar;
 
     //Temporary storage for a web update description being considered for application.
     //Do not trust this as the in-use web update.
@@ -62,6 +73,9 @@ public Q_SLOTS:
     void hideWindow();
 
     void setupTrayIcon();
+    void setupNavToolbar();
+    void changeLocation();
+    void updateLocationEdit(const QUrl& newUrl);
 
     ///Used to schedule a custom URL for processing later, once the app has finished starting
     void deferCustomUrl(QString url);
