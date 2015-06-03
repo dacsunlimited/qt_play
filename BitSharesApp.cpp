@@ -293,7 +293,7 @@ int BitSharesApp::run(int& argc, char** argv)
 
    BitSharesApp app(argc, argv);
    QTranslator bitsharesTranslator;
-   bitsharesTranslator.load(QLocale::system().name(), QStringLiteral(":/"));
+   bitsharesTranslator.load(QLocale::system().name()+".qm");
    app.installTranslator(&bitsharesTranslator);
 
 #ifdef __APPLE__
@@ -484,12 +484,9 @@ void BitSharesApp::prepareStartupSequence(ClientWrapper* client, Html5Viewer* vi
 
       ilog("Webview loaded: ${status}", ("status", ok));
       viewer->disconnect(*loadFinishedConnection);
-      //The web GUI takes a moment to settle; let's give it some time.
-      QTimer::singleShot(100, mainWindow, SLOT(show()));
-      splash->finish(mainWindow);
-      mainWindow->setupTrayIcon();
+      splash->close();
+      mainWindow->show();
       mainWindow->processDeferredUrl();
-      mainWindow->checkWebUpdates(false);
    });
    client->connect(client, &ClientWrapper::error, [=](QString errorString) {
       splash->hide();
