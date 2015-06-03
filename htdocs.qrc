@@ -63,5 +63,9 @@
     <file>htdocs/webfonts/opensans-regular.woff</file>
     <file>htdocs/webfonts/ui-grid.ttf</file>
     <file>htdocs/webfonts/ui-grid.woff</file>
+    <file>htdocs/webfonts/ionicons.eot</file>
+    <file>htdocs/webfonts/ionicons.svg</file>
+    <file>htdocs/webfonts/ionicons.ttf</file>
+    <file>htdocs/webfonts/ionicons.woff</file>
   </qresource>
 </RCC>
