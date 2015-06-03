@@ -26,6 +26,9 @@ class MainWindow : public QMainWindow
     QMenu* _accountMenu;
     QString _deferredUrl;
 
+    QLineEdit *_locationEdit;
+    QToolBar *_navToolBar;
+
     //Temporary storage for a web update description being considered for application.
     //Do not trust this as the in-use web update.
     WebUpdateManifest::UpdateDetails _webUpdateDescription;
@@ -66,6 +69,10 @@ public Q_SLOTS:
     //Causes this window to attempt to become the front window on the desktop
     void takeFocus();
     void hideWindow();
+
+    void setupNavToolbar();    
+    void changeLocation();      
+    void updateLocationEdit(const QUrl& newUrl);
 
     ///Used to schedule a custom URL for processing later, once the app has finished starting
     void deferCustomUrl(QString url);
