@@ -58,6 +58,7 @@ class MainWindow : public QMainWindow
     QUuid getAppId() const { return app_id; }
 
 public Q_SLOTS:
+    void goToHomepage();
     void goToMyAccounts();
     void goToAccount(QString accountName);
     void goToCreateAccount();

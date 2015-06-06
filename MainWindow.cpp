@@ -251,6 +251,17 @@ bool MainWindow::detectCrash()
   return crashState == "crashed";
 }
 
+void MainWindow::goToHomepage()
+{
+    //navigateTo("/home");
+    if( walletIsUnlocked() ) {
+        
+        QUrl url = QString::fromStdString("http://" + std::string( *(clientWrapper()->get_httpd_endpoint()) ) + "/#/home" );
+        
+        getViewer()->webView()->load(url);
+    }
+}
+
 void MainWindow::goToMyAccounts()
 {
     navigateTo("/accounts");
@@ -303,10 +314,12 @@ void MainWindow::setupNavToolbar()
 {
     _navToolBar = addToolBar(tr("Navigation"));
     
+    QAction* homeAct = new QAction(QIcon(":/images/qtapp.ico"), tr("&Home..."), this);
+    connect(homeAct, SIGNAL(triggered()), this, SLOT(goToHomepage()));
+    
+    _navToolBar->addAction(homeAct);
     _navToolBar->addAction(getViewer()->webView()->pageAction(QWebPage::WebAction::Back));
     _navToolBar->addAction(getViewer()->webView()->pageAction(QWebPage::WebAction::Forward));
-    //_navToolBar->addAction(getViewer()->webView()->pageAction(QWebPage::WebAction::Reload));
-    //_navToolBar->addAction(getViewer()->webView()->pageAction(QWebPage::WebAction::Stop));
 
     
     _locationEdit = new QLineEdit(this);
@@ -319,7 +332,12 @@ void MainWindow::setupNavToolbar()
 
 void MainWindow::changeLocation()
 {
+    if( !walletIsUnlocked() )
+        return;
+    
     QUrl url = QUrl::fromUserInput(_locationEdit->text());
+    ilog("change URL to ${url}", ("url", url.toString().toStdString()));
+    
     getViewer()->webView()->load(url);
     getViewer()->webView()->setFocus();
 

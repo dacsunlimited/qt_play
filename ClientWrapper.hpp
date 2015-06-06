@@ -34,6 +34,8 @@ class ClientWrapper : public QObject
     bool has_web_package() {
       return !_web_package.empty();
     }
+    
+    fc::optional<fc::ip::endpoint>  get_httpd_endpoint() {return _actual_httpd_endpoint;}
 
     QString get_data_dir();
 
