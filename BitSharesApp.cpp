@@ -458,9 +458,7 @@ void BitSharesApp::prepareStartupSequence(ClientWrapper* client, Html5Viewer* vi
        
       //Disallow navigating to pages not served by us
       if (!newUrl.isEmpty() && newUrl.host() != "localhost" && newUrl.host() != "127.0.0.1") {
-//         elog("Denying request to browse to non-localhost URL ${url}", ("url", newUrl.toString().toStdString()));
-//         QTimer::singleShot(0, viewer->webView(), SLOT(back()));
-//         Utilities::open_in_external_browser(newUrl);
+         ilog("browse to non-localhost URL ${url}", ("url", newUrl.toString().toStdString()));
          return;
       }
 
