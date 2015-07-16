@@ -344,7 +344,7 @@ void MainWindow::updateLocationEdit(const QUrl& newUrl)
         QString str = newUrl.toString();
         QRegularExpression re("^.*#");
 
-        str.replace(re, CUSTOM_URL_SCHEME ":");
+        str.replace(re, CUSTOM_URL_SCHEME ":/");
         
         _locationEdit->setText(str);
         
