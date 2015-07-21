@@ -43,6 +43,7 @@
 #include <Carbon/Carbon.h>
 #endif
 
+
 MainWindow::MainWindow()
   : _settings("BitShares", BTS_BLOCKCHAIN_NAME),
     _updateChecker(new QTimer(this)),
@@ -113,113 +114,96 @@ void MainWindow::processDeferredUrl()
   _deferredUrl.clear();
 }
 
+
+//
+/*
+ 
+Left panel links:
+ 
+    xts://#/home
+    xts://#/accounts
+    xts://#/directory/favorites
+    xts://#/delegates
+    xts://#/notes
+    xts://#/blocks   
+    xts://#/blocks/num
+    xts://#/preferences
+    xts://#/console
+    xts://#/help
+
+previous custom url links:
+ 
+    xts://#/newcontact/name:key
+    xts://#/accounts/name
+ 
+ */
+
 void MainWindow::processCustomUrl(QString url)
 {
-  if( url.left(url.indexOf(':')).toLower() != CUSTOM_URL_SCHEME )
-  {
-    elog("Got URL of unknown scheme: ${url}", ("url", url.toStdString()));
-    return;
-  }
-
-  url = url.mid(url.indexOf(':') + 1);
-  while( url.startsWith('/') ) url.remove(0, 1);
-  ilog("Processing custom URL request for ${url}", ("url", url.toStdString()));
-
-  QStringList components = url.split('/', QString::SkipEmptyParts);
-  if( components.empty() )
-  {
-    elog("Invalid URL has no contents!");
-    QMessageBox::warning(this, tr("Invalid URL"), tr("The URL provided is not valid."));
-    return;
-  }
-
-  if( components[0].contains(':') )
-  {
-    //This is a username:key pair
-    int colon = components[0].indexOf(':');
-    QString username = components[0].left(colon);
-    QString key(components[0].mid(colon+1));
-
-    if(!walletIsUnlocked())
-      return;
-
-    navigateTo("/newcontact?name=" + username + "&key=" + key);
-  }
-  else if( components[0].toLower() == components[0] )
-  {
-    //This is a username.
-    auto account = _clientWrapper->get_client()->blockchain_get_account(components[0].toStdString());
-    if( !account.valid() )
+    if( url.left(url.indexOf(':')).toLower() != CUSTOM_URL_SCHEME )
     {
-      QMessageBox::warning(this, tr("Invalid Account"), tr("The requested account does not exist."));
-      return;
+        elog("Got URL of unknown scheme: ${url}", ("url", url.toStdString()));
+        return;
+    }
+    
+    url = url.mid(url.indexOf(':') + 1);
+    while( url.startsWith('/') ) url.remove(0, 1);
+    ilog("Processing custom URL request for ${url}", ("url", url.toStdString()));
+    
+    QStringList components = url.split('/', QString::SkipEmptyParts);
+    if( components.empty() )
+    {
+        elog("Invalid URL has no contents!");
+        QMessageBox::warning(this, tr("Invalid URL"), tr("The URL provided is not valid."));
+        return;
+    }
+    
+    
+    QString urlStr = QString::fromStdString("http://" + std::string( *(clientWrapper()->get_httpd_endpoint()) ) + "/#");
+    QString str = components[0].toLower();
+    
+    if(str == "home"  || str == "delegates" || str == "notes" || str =="directory" || str =="newcontact" ||
+       str == "preferences" || str == "console" || str == "help")
+    {
+        urlStr.append(QString("/") + QString(str));
+    }
+    else if(str == "accounts")
+    {
+        if(components.size()==1)
+            urlStr.append(QString("/accounts"));
+        else if(components.size() == 2)
+        {
+            urlStr.append(QString("/accounts/") + components[1]);
+        }
+    }
+    else if(str == "blocks" )
+    {
+        if(components.size()==1)
+            urlStr.append(QString("/blocks"));
+        else if(components.size() == 2)
+        {
+            bool ok = false;
+            uint32_t blockNumber = components[1].toInt(&ok);
+            
+            if( ok )
+            {
+                urlStr.append(QString("/blocks/") + QString::number(blockNumber));
+            }
+            else
+                QMessageBox::warning(this, tr("Invalid Block Number"), tr("The specified block number does not exist."));
+        }
     }
     else
-      goToAccount(components[0]);
-
-    if( walletIsUnlocked(false) && components.size() > 1 )
-    {
-      if( components[1] == "approve" )
-        _clientWrapper->confirm_and_set_approval(components[0], true);
-      else if( components[1] == "disapprove" )
-        _clientWrapper->confirm_and_set_approval(components[0], false);
-      else if( components[1] == "transfer" )
-        goToTransfer(components);
-    }
-  }
-  else if( components[0].size() > QString(BTS_ADDRESS_PREFIX).size() && components[0].startsWith(BTS_ADDRESS_PREFIX) )
-  {
-    //This is a key.
-  }
-  else if( components[0].size() >= BTS_BLOCKCHAIN_MIN_SYMBOL_SIZE
-           && components[0].size() <= BTS_BLOCKCHAIN_MAX_SYMBOL_SIZE
-           && components[0].toUpper() == components[0] )
-  {
-    //This is an asset symbol.
-  }
-  else if( components[0] == "Login" )
-  {
-    //This is a login request
-    if( components.size() < 4 )
-    {
-      elog("Invalid URL has ${url_parts} parts, but should have at least 4.", ("url_parts", components.size()));
-      QMessageBox::warning(this, tr("Invalid URL"), tr("The URL provided is not valid."));
-      return;
-    }
-    if( !walletIsUnlocked() )
-      return;
-
-    doLogin(components.mid(1));
-  }
-  else if( components[0] == "Block" )
-  {
-    //This is a block ID or number
-    if( components.size() == 1 )
-    {
-      elog("Invalid URL has only one part, but should have at least two.");
-      QMessageBox::warning(this, tr("Invalid URL"), tr("The URL provided is not valid."));
-      return;
-    }
-    if( components[1] == "num" && components.size() > 2 )
-    {
-      bool ok = false;
-      uint32_t blockNumber = components[2].toInt(&ok);
-      if( ok )
-        goToBlock(blockNumber);
-      else
-        QMessageBox::warning(this, tr("Invalid Block Number"), tr("The specified block number does not exist."));
-    }
-    else
-      goToBlock(components[1]);
-  }
-  else if( components[0] == "Trx" )
-  {
-    goToTransaction(components[1]);
-  }
-  else if( components[0] == "RefCode" )
-  {
-    goToRefCode(components);
-  }
+        return;
+    
+    QUrl realurl = urlStr;
+    
+    ilog("Processing custom URL request for real url ${url}", ("url", realurl.toString().toStdString()));
+    
+    getViewer()->webView()->load(realurl);
+    getViewer()->webView()->setFocus();
+    
+    return;
 }
 
 ClientWrapper *MainWindow::clientWrapper() const
@@ -248,6 +232,17 @@ bool MainWindow::detectCrash()
   _settings.setValue("crash_state", "crashed");
 
   return crashState == "crashed";
+}
+
+void MainWindow::goToHomepage()
+{
+    //navigateTo("/home");
+    if( walletIsUnlocked() ) {
+        
+        QUrl url = QString::fromStdString("http://" + std::string( *(clientWrapper()->get_httpd_endpoint()) ) + "/#/home" );
+        
+        getViewer()->webView()->load(url);
+    }
 }
 
 void MainWindow::goToMyAccounts()
@@ -296,6 +291,65 @@ void MainWindow::hideWindow()
 #else
     setVisible(false);
 #endif
+}
+
+void MainWindow::setupNavToolbar()
+{
+    _navToolBar = addToolBar(tr("Navigation"));
+    
+    QAction* homeAct = new QAction(QIcon(":/images/qtapp.ico"), tr("&Home..."), this);
+    connect(homeAct, SIGNAL(triggered()), this, SLOT(goToHomepage()));
+    
+    _navToolBar->addAction(homeAct);
+    _navToolBar->addAction(getViewer()->webView()->pageAction(QWebPage::WebAction::Back));
+    _navToolBar->addAction(getViewer()->webView()->pageAction(QWebPage::WebAction::Forward));
+
+    
+    _locationEdit = new QLineEdit(this);
+    _locationEdit->setSizePolicy(QSizePolicy::Expanding, _locationEdit->sizePolicy().verticalPolicy());
+    connect(_locationEdit, SIGNAL(returnPressed()), SLOT(changeLocation()));
+    
+    _navToolBar->addWidget(_locationEdit);
+    
+}
+
+void MainWindow::changeLocation()
+{
+    if( !walletIsUnlocked() )
+        return;
+    
+    QString urlstr = _locationEdit->text();
+    
+    ilog("change URL to ${url}", ("url", urlstr.toStdString()));
+    
+    if( urlstr.left(urlstr.indexOf(':')).toLower() == CUSTOM_URL_SCHEME )
+    {
+        processCustomUrl(urlstr);
+    
+        return;
+    }
+    
+    QUrl url = QUrl::fromUserInput(urlstr);
+    
+    getViewer()->webView()->load(url);
+    getViewer()->webView()->setFocus();
+
+}
+
+void MainWindow::updateLocationEdit(const QUrl& newUrl)
+{
+    ilog("update edit control with URL ${url}", ("url", newUrl.toString().toStdString()));
+    
+    if (newUrl.host() == "localhost" || newUrl.host() == "127.0.0.1") {
+        QString str = newUrl.toString();
+        QRegularExpression re("^.*#");
+
+        str.replace(re, CUSTOM_URL_SCHEME ":/");
+        
+        _locationEdit->setText(str);
+        
+    }else
+        _locationEdit->setText(newUrl.toString());
 }
 
 void MainWindow::goToBlock(uint32_t blockNumber)

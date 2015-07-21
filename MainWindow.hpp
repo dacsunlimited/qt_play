@@ -10,6 +10,14 @@
 #include <QTimer>
 #include <QUuid>
 
+#include <QtWidgets>
+//#include <QtWebEngineWidgets>
+
+QT_BEGIN_NAMESPACE
+class QWebEngineView;
+class QLineEdit;
+QT_END_NAMESPACE
+
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -17,6 +25,9 @@ class MainWindow : public QMainWindow
     QMenu* _fileMenu;
     QMenu* _accountMenu;
     QString _deferredUrl;
+
+    QLineEdit *_locationEdit;
+    QToolBar *_navToolBar;
 
     //Temporary storage for a web update description being considered for application.
     //Do not trust this as the in-use web update.
@@ -47,6 +58,7 @@ class MainWindow : public QMainWindow
     QUuid getAppId() const { return app_id; }
 
 public Q_SLOTS:
+    void goToHomepage();
     void goToMyAccounts();
     void goToAccount(QString accountName);
     void goToCreateAccount();
@@ -58,6 +70,10 @@ public Q_SLOTS:
     //Causes this window to attempt to become the front window on the desktop
     void takeFocus();
     void hideWindow();
+
+    void setupNavToolbar();    
+    void changeLocation();      
+    void updateLocationEdit(const QUrl& newUrl);
 
     ///Used to schedule a custom URL for processing later, once the app has finished starting
     void deferCustomUrl(QString url);
