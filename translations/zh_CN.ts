@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0" language="zh_CN">
+<TS version="2.1" language="zh_CN">
 <context>
     <name>BitSharesApp</name>
     <message>
@@ -148,7 +148,7 @@
     <message>
         <location filename="../MainWindow.cpp" line="172"/>
         <source>The requested account does not exist.</source>
-        <translation>请求访问的账户不存在</translation>
+        <translation>请求访问的账户不存在。</translation>
     </message>
     <message>
         <location filename="../MainWindow.cpp" line="228"/>
@@ -252,7 +252,7 @@ Memo: %4</source>
     <message>
         <location filename="../MainWindow.cpp" line="458"/>
         <source>You are about to log in to %1 as %2. Would you like to continue?</source>
-        <translation>你将要以 %2 的角色登陆到 1% ，你想继续吗？</translation>
+        <translation>你将要以 %2 的角色登陆到 1% ，你想继续吗?</translation>
     </message>
     <message>
         <location filename="../MainWindow.cpp" line="481"/>
@@ -420,7 +420,7 @@ Memo: %4</source>
     <message>
         <location filename="../MainWindow.cpp" line="827"/>
         <source>A patch update to version %2.%3.%4-%5 is available for %1. You will not need to restart %1 to install it. You may install it later by selecting Check for Updates from the File menu. Would you like to install it now?</source>
-        <translation>一个给 %1 的补丁更新包到版本 %2.%3.%4-%5 已经可用。你可以安装它而不需要重新启动 %1 。你可以稍后通过从文件菜单选择检测更新的功能来安装它。</translation>
+        <translation>一个给 %1 的补丁更新包到版本 %2.%3.%4-%5 已经可用。你可以选择安装它而不需要重新启动 %1 。你也可以稍后通过从选择【文件菜单】-&gt;【检测更新】的功能来安装它。你是否现在安装更新？</translation>
     </message>
     <message>
         <location filename="../MainWindow.cpp" line="862"/>
