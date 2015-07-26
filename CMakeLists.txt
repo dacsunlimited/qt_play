@@ -253,7 +253,8 @@ ENDIF()
 # Set up a pre-build step to do this:
 set(static_bitshares_resource_files bitshares.qrc
                                     images/splash_screen.jpg
-                                    images/qtapp.ico)
+                                    images/qtapp.ico
+                                    images/qtapp64.png)
 foreach(static_resource_file ${static_bitshares_resource_files})
   get_filename_component(static_resource_file_path "${static_resource_file}" DIRECTORY)
   set(PRE_BUILD_STEP_COMMANDS ${PRE_BUILD_STEP_COMMANDS}
