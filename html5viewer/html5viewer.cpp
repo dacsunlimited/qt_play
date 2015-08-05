@@ -1137,6 +1137,8 @@ Html5Viewer::Html5Viewer(QWidget *parent)
     , m_d(new Html5ViewerPrivate(this))
 {
     webView()->page()->settings()->setAttribute( QWebSettings::PluginsEnabled, false );
+    webView()->page()->setLinkDelegationPolicy(QWebPage::DelegateAllLinks);
+    
     setOrientation(Html5Viewer::ScreenOrientationAuto);
     webView()->setAcceptHoverEvents(true);
     webView()->setFocus(Qt::ActiveWindowFocusReason);

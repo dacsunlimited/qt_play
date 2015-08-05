@@ -2,5 +2,6 @@
     <qresource prefix="/">
         <file>images/splash_screen.jpg</file>
         <file>images/qtapp.ico</file>
+        <file>images/qtapp64.png</file>
     </qresource>
 </RCC>

@@ -297,7 +297,7 @@ void MainWindow::setupNavToolbar()
 {
     _navToolBar = addToolBar(tr("Navigation"));
     
-    QAction* homeAct = new QAction(QIcon(":/images/qtapp.ico"), tr("&Home..."), this);
+    QAction* homeAct = new QAction(QIcon(":/images/qtapp64.png"), tr("&Home..."), this);
     connect(homeAct, SIGNAL(triggered()), this, SLOT(goToHomepage()));
     
     _navToolBar->addAction(homeAct);

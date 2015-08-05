@@ -377,6 +377,7 @@ int BitSharesApp::run()
    delete sock;
 
    auto viewer = new Html5Viewer;
+
    std::unique_ptr<ClientWrapper> clientWrapper(new ClientWrapper);
 
    if (crashedPreviously)
@@ -467,6 +468,12 @@ void BitSharesApp::prepareStartupSequence(ClientWrapper* client, Html5Viewer* vi
       viewer->webView()->page()->mainFrame()->addToJavaScriptWindowObject("bitshares", client);
       viewer->webView()->page()->mainFrame()->addToJavaScriptWindowObject("magic_unicorn", new Utilities, QWebFrame::ScriptOwnership);
    });
+    
+    viewer->connect(viewer->webView(), &QGraphicsWebView::linkClicked, [viewer,client,mainWindow] (const QUrl& newUrl){
+        viewer->webView()->load(newUrl);
+        viewer->webView()->setFocus();
+    });
+
    QObject::connect(viewer->webView()->page()->networkAccessManager(), &QNetworkAccessManager::authenticationRequired,
                     [client](QNetworkReply*, QAuthenticator* auth) {
       auth->setUser(client->http_url().userName());
