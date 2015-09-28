@@ -10,7 +10,7 @@
 #include <set>
 #include <vector>
 
-const static char*                                          WEB_UPDATES_MANIFEST_URL = "http://dacplay.org/manifest.json";
+const static char*                                          WEB_UPDATES_MANIFEST_URL = "https://dacplay.org/manifest.json";
 const static uint8_t                                        WEB_UPDATES_SIGNATURE_REQUIREMENT = 2;
 const static std::unordered_set<bts::blockchain::address>   WEB_UPDATES_SIGNING_KEYS ({
     bts::blockchain::address( BTS_ADDRESS_PREFIX + std::string( "4ucXsqrD7uvPF4oaQGZtyapdbgZfGMrcP" ) ),
