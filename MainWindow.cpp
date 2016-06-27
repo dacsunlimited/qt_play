@@ -789,6 +789,12 @@ void MainWindow::initMenu()
   _fileMenu->addAction(tr("Remove Updates"), this, SLOT(removeWebUpdates()));
   _fileMenu->addAction(tr("Quit"), qApp, SLOT(quit()), QKeySequence(tr("Ctrl+Q")));
 
+  connect(_fileMenu->addAction(tr("Open PLAY in default browser")), &QAction::triggered, [this](){
+    QUrl url = clientWrapper()->http_url();
+    ilog("loading for URL ${url}", ("url", url.toString().toStdString()));
+    Utilities::open_in_external_browser(url);
+  });
+
   _accountMenu = menuBar->addMenu(tr("Accounts"));
   setMenuBar(menuBar);
 }
